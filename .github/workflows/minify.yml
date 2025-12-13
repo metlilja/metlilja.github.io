@@ -1,0 +1,31 @@
+# This workflow minifies the source files and updates the gh-pages branch
+
+name: CI
+
+on:
+  # Triggers the workflow on push events for the main branch
+  push:
+    branches: [main]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  minify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Remove unnecessary files
+        run: rm -rf Taskfile.yml README.md articles/.template
+      - name: Install minify
+        run: sudo apt install minify
+      - name: Minify files
+        run: minify -r . -o .
+      - name: Push to gh-pages branch
+        run: |
+          git checkout -b gh-pages
+          git config user.name "Lilja Metsälampi"
+          git config user.email "lilja.metsalampi@aalto.fi"
+          git commit -am "Minify files"
+          git push -u origin gh-pages -f
